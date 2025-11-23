@@ -24,6 +24,29 @@ class ApiCallController extends AbstractController
     {
         // Récupérer l'URL depuis les paramètres de requête
         $url = $request->query->get('url', 'http://localhost:8000/');
+
+        // Validation de l'URL
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return $this->json([
+                'error' => 'Invalid URL format',
+            ], 400);
+        }
+
+        // Protection SSRF : bloquer les IPs privées et localhost
+        $host = parse_url($url, PHP_URL_HOST);
+        if ($host && (filter_var($host, FILTER_VALIDATE_IP) && !filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))) {
+            return $this->json([
+                'error' => 'Access to private IP addresses is not allowed',
+            ], 403);
+        }
+
+        // Protection contre localhost
+        if (in_array(strtolower($host), ['localhost', '127.0.0.1', '::1'])) {
+            return $this->json([
+                'error' => 'Access to localhost is not allowed',
+            ], 403);
+        }
+
         try {
             $h1 = $fetchH1($url);
             return $this->json([

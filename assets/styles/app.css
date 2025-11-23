@@ -1,22 +1,196 @@
- body {
-     font-family: Arial, sans-serif;
-     max-width: 800px;
-     margin: 50px auto;
-     padding: 20px;
-     background-color: #f5f5f5;
+ /* =============================================
+    Ecoscraping – Global Styles (refactored)
+    - Variables
+    - Reset & Base
+    - Typography
+    - Layout helpers
+    - Navbar
+    - Responsiveness & a11y
+    ============================================= */
+
+ /* Variables */
+ :root {
+   --color-bg: #f5f5f5;
+   --color-surface: #ffffff;
+   --color-text: #333333;
+   --color-text-muted: #666666;
+   --color-primary: #007bff;
+   --color-navbar-bg: #333333;
+   --color-navbar-hover: #555555;
+   --color-separator: #444444;
+
+   --radius-md: 8px;
+   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+   --space-1: 0.25rem;
+   --space-2: 0.5rem;
+   --space-3: 0.75rem;
+   --space-4: 1rem;
+   --space-6: 1.5rem;
+   --space-8: 2rem;
+
+   --container-max: 800px;
+   --navbar-max: 1200px;
+   --bp-md: 768px;
  }
-.container {
-    background-color: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-h1 {
-    color: #333;
-    border-bottom: 3px solid #007bff;
-    padding-bottom: 10px;
-}
-p {
-    color: #666;
-    line-height: 1.6;
-}
+
+ /* Reset */
+ * {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+ }
+
+ /* Base */
+ body {
+   font-family: Arial, sans-serif;
+   background-color: var(--color-bg);
+   max-width: var(--container-max);
+   margin: 50px auto;
+   padding: 20px;
+   color: var(--color-text);
+ }
+
+ /* Typography */
+ h1 {
+   color: var(--color-text);
+   border-bottom: 3px solid var(--color-primary);
+   padding-bottom: 10px;
+ }
+
+ p {
+   color: var(--color-text-muted);
+   line-height: 1.6;
+ }
+
+ /* Layout helpers */
+ .container {
+   background-color: var(--color-surface);
+   padding: 30px;
+   border-radius: var(--radius-md);
+   box-shadow: var(--shadow-sm);
+ }
+
+ /* Navbar */
+ .navbar {
+   background-color: var(--color-navbar-bg);
+   padding: var(--space-4);
+   position: relative;
+ }
+
+ .navbar-container {
+   max-width: var(--navbar-max);
+   margin: 0 auto;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+ }
+
+ .navbar-logo {
+   color: #fff;
+   font-size: 1.5rem;
+   font-weight: bold;
+   text-decoration: none;
+ }
+
+ .navbar-menu {
+   display: flex;
+   list-style: none;
+   gap: 2rem;
+ }
+
+ .navbar-menu a {
+   color: #fff;
+   text-decoration: none;
+   padding: 0.5rem 1rem;
+   border-radius: 4px;
+   transition: background-color 0.3s ease;
+ }
+
+ .navbar-menu a:hover,
+ .navbar-menu a:focus-visible {
+   background-color: var(--color-navbar-hover);
+ }
+
+ /* Checkbox caché pour le menu mobile */
+ .navbar-toggle {
+   display: none;
+ }
+
+ .navbar-toggle-label {
+   display: none;
+   flex-direction: column;
+   cursor: pointer;
+   gap: 4px;
+ }
+
+ .navbar-toggle-label span {
+   width: 25px;
+   height: 3px;
+   background-color: #fff;
+   border-radius: 2px;
+   transition: transform 0.3s ease, opacity 0.3s ease;
+ }
+
+ /* Responsive */
+ @media (max-width: 768px) {
+   .navbar-toggle-label {
+     display: flex;
+   }
+
+   .navbar-menu {
+     position: absolute;
+     top: 100%;
+     left: 0;
+     right: 0;
+     background-color: var(--color-navbar-bg);
+     flex-direction: column;
+     gap: 0;
+     max-height: 0;
+     overflow: hidden;
+     transition: max-height 0.3s ease-in-out;
+   }
+
+   .navbar-menu li {
+     border-top: 1px solid var(--color-separator);
+   }
+
+   .navbar-menu a {
+     display: block;
+     padding: 1rem;
+   }
+
+   /* Afficher le menu quand la checkbox est cochée */
+   .navbar-toggle:checked ~ .navbar-menu {
+     max-height: 500px;
+   }
+
+   /* Animation du hamburger en X */
+   .navbar-toggle:checked ~ .navbar-toggle-label span:nth-child(1) {
+     transform: rotate(45deg) translate(5px, 5px);
+   }
+
+   .navbar-toggle:checked ~ .navbar-toggle-label span:nth-child(2) {
+     opacity: 0;
+   }
+
+   .navbar-toggle:checked ~ .navbar-toggle-label span:nth-child(3) {
+     transform: rotate(-45deg) translate(7px, -6px);
+   }
+ }
+
+ /* Accessibility */
+ .navbar-menu a:focus-visible {
+   outline: 2px solid var(--color-primary);
+   outline-offset: 2px;
+ }
+
+ /* Reduced motion preference */
+ @media (prefers-reduced-motion: reduce) {
+   *, *::before, *::after {
+     animation-duration: 0.001ms !important;
+     animation-iteration-count: 1 !important;
+     transition-duration: 0.001ms !important;
+     scroll-behavior: auto !important;
+   }
+ }

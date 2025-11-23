@@ -39,6 +39,36 @@ class FetchH1HeadingsTest extends TestCase
         $this->assertSame(['Hello World'], $result);
     }
 
+    public function testReturnsEmptyArrayWhenContentTypeIsTextPlain(): void
+    {
+        $response = new HttpResponse(200, 'text/plain; charset=UTF-8', 'Just text, not HTML');
+        $useCase = $this->makeUseCaseReturning($response);
+
+        $result = $useCase('http://example.com/plain');
+
+        $this->assertSame([], $result);
+    }
+
+    public function testReturnsEmptyArrayWhenContentTypeIsXml(): void
+    {
+        $response = new HttpResponse(200, 'application/xml', '<root><h1>Should not be parsed</h1></root>');
+        $useCase = $this->makeUseCaseReturning($response);
+
+        $result = $useCase('http://example.com/xml');
+
+        $this->assertSame([], $result);
+    }
+
+    public function testReturnsEmptyArrayWhenContentTypeIsEmpty(): void
+    {
+        $response = new HttpResponse(200, '', '<h1>Title</h1>');
+        $useCase = $this->makeUseCaseReturning($response);
+
+        $result = $useCase('http://example.com/unknown');
+
+        $this->assertSame([], $result);
+    }
+
     public function testExtractsMultipleH1AndTrimsWhitespace(): void
     {
         $html = '<h1>  First  </h1><div><h1>Second</h1></div><h1>   Third</h1>';

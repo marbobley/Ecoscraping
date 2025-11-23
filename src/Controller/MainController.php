@@ -12,7 +12,7 @@ use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Application\UseCase\FetchH1Headings;
 
 class MainController extends AbstractController
 {
@@ -73,34 +73,22 @@ class MainController extends AbstractController
      * @throws ServerExceptionInterface
      */
     #[Route('/api/call', name: 'app_api_call', methods: ['GET'])]
-    public function callLocalApi(Request $request,HttpClientInterface $client): Response
+    public function callLocalApi(Request $request, FetchH1Headings $fetchH1): JsonResponse
     {
         // Récupérer l'URL depuis les paramètres de requête
         $url = $request->query->get('url', 'http://localhost:8000/');
-
-        $response = $client->request(
-            'GET',
-            $url
-        );
-
-        $statusCode = $response->getStatusCode();
-        $contentType = $response->getHeaders()['content-type'][0];
-        $content = $response->getContent();
-        // Extraire uniquement les balises h1
-        $h1Tags = [];
-        $dom = new \DOMDocument();
-
-        // Désactiver temporairement les erreurs libxml
-        libxml_use_internal_errors(true);
-        $dom->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING);
-        libxml_clear_errors(); // Nettoyer les erreurs capturées
-
-        $h1Elements = $dom->getElementsByTagName('h1');
-        foreach ($h1Elements as $h1) {
-            $h1Tags[] = $h1->textContent;
+        try {
+            $h1 = $fetchH1($url);
+            return $this->json([
+                'url' => $url,
+                'h1' => $h1,
+                'count' => count($h1),
+            ]);
+        } catch (TransportExceptionInterface|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|DecodingExceptionInterface $e) {
+            return $this->json([
+                'error' => 'Failed to fetch the URL',
+                'message' => $e->getMessage(),
+            ], 502);
         }
-
-        dd($h1Tags);
-        return new Response($content, $statusCode, ['Content-Type' => $contentType]);
     }
 }

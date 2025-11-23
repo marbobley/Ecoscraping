@@ -18,3 +18,6 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Bind the domain port to the infrastructure adapter (Hexagonal Architecture)
+    App\Domain\Http\HttpClientPort: '@App\Infrastructure\Http\SymfonyHttpClientAdapter'
